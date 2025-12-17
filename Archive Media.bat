@@ -14,7 +14,7 @@ setlocal enabledelayedexpansion
 
 rem ==========[ Config ]==========
 
-rem auto delete sourve media file
+rem auto delete source media file
 rem after successful conversion.
 rem THIS WILL DELETE IRREVERSIBLY
 rem yes | no
