@@ -3,6 +3,38 @@ title Archive Media
 if not defined in_subprocess (cmd /k set in_subprocess=y ^& %0 %*) & exit
 setlocal enabledelayedexpansion
 
+
+
+
+
+
+
+
+
+
+rem ==========[ Config ]==========
+
+rem auto delete sourve media file
+rem after successful conversion.
+rem THIS WILL DELETE IRREVERSIBLY
+rem yes | no
+set "autoDelete=no"
+
+rem =======[ Config Check ]=======
+
+if not "!autoDelete!"=="yes" set "autoDelete=no"
+
+rem ========[ Config End ]========
+
+
+
+
+
+
+
+
+
+
 rem	Copyright (C) 2025 Alpar Duman
 rem	This file is part of archive-media-batch.
 rem	
@@ -79,11 +111,9 @@ rem archiving
 :processFile
 set "input=%~1"
 set "inputDrivePath=%~dp1"
-set "inputDrivePathName=%~dpn1"
 set "inputName=%~n1"
-set "wipName=!inputName!.archive"
-set "wip=!tempFolder!!wipName!"
-set "output=!inputDrivePath!!wipName"
+set "outputName=!inputName!.archive"
+set "wip=!tempFolder!!outputName!"
 
 rem skip on archive suffix
 if not "!inputName!"=="!inputName:.archive=!" (
@@ -128,17 +158,23 @@ if "!hasVideo!"=="2" (
 ) else (
 	if "!hasAudio!!hasVideo!"=="01" (
 		if "!hasAlpha!"=="1" (
-			call :convertTransparent
+			call :convertImageTransparent
 		) else (
 			call :convertImage
 		)
 	) else (
 		if "!hasAudio!!hasVideo!"=="11" (
-			call :convertMusic
-		) else (
 			call :convertMusicCover
+		) else (
+			call :convertMusic
 		)
 	)
+)
+
+rem move output to source folder
+if not errorlevel 1 (
+	call :exportFile "!wipExtension!"
+	if "!autoDelete!"=="yes" del "!input!"
 )
 
 rem archived
@@ -170,24 +206,37 @@ exit /b 0
 
 rem convert as video
 :convertVideo
-rem WIP
-echo:VIDEO !input!
+set "wipExtension=mp4"
 
-rem support 10bit 
-set "pixfmt=yuv420p"
-for /f "tokens=*" %%a in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v:0 -show_entries stream^=bits_per_raw_sample -of default^=noprint_wrappers^=1:nokey^=1 "!input!" 2^>nul') do (
-	if "%%a"=="10" set "pixfmt=yuv420p10le"
+rem archived already exists
+if exist "!inputDrivePath!!outputName!.!wipExtension!" (
+	echo:EXIST !input!
+	exit /b 0
 )
 
+rem announce conversion
+echo:VIDEO !input!
+
+rem support high bit depth
+set "profile=high"
+set "pixfmt=yuv420p"
+for /f "tokens=*" %%a in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v:0 -show_entries stream^=bits_per_raw_sample -of default^=noprint_wrappers^=1:nokey^=1 "!input!" 2^>nul') do if "%%a"=="10" (
+	set "profile=high10"
+	set "pixfmt=yuv420p10le"
+)
+
+rem prepare query
+set "query=-map 0:v -c:v libx264 -profile:v !profile! -tag:v avc1 -crf 18 -preset placebo -x264-params ref=4:log-level=error -fps_mode cfr -g 60"
+set "query=!query! -map 0:a? -c:a aac -tag:a mp4a -b:a 192k"
+set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
+set "query=-metadata comment="!version! !url! !query!" !query!"
+
 rem convert to temp
-start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" ^
--map 0:v -c:v libx264 -tag:v avc1 -crf 18 -preset placebo -x264-params ref=4:log-level=error -fps_mode cfr -g 60 ^
--map 0:a? -c:a aac -tag:a mp4a -b:a 192k ^
--pix_fmt !pixfmt! -movflags +faststart "!wip!.mp4"
+start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" !query! "!wip!.!wipExtension!"
 
 rem error
 if not errorlevel 0 (
-	del "!wip!.mp4"
+	del "!wip!.!wipExtension!"
 	color 0C
     echo Encoding failed
     pause
@@ -196,7 +245,6 @@ if not errorlevel 0 (
 )
 
 rem success
-call :exportFile "mp4"
 exit /b 0
 
 
@@ -209,7 +257,7 @@ exit /b 0
 
 
 rem convert as transparent
-:convertTransparent
+:convertImageTransparent
 rem WIP
 echo:IMAGE TRANSPARENT !input!
 exit /b 0
@@ -278,7 +326,7 @@ if "!robocopySource:~-1!"=="\" set "robocopySource=!robocopySource:~0,-1!"
 if "!robocopyTarget:~-1!"=="\" set "robocopyTarget=!robocopyTarget:~0,-1!"
 
 rem move file
-robocopy "!robocopySource!" "!robocopyTarget!" "!wipName!.!wipExtension!" /MOV /R:3 /W:5 /NFL /NDL /NJH /NJS /NC /NS 2>&1
+robocopy "!robocopySource!" "!robocopyTarget!" "!outputName!.!wipExtension!" /MOV /R:3 /W:5 /IS /IT /NFL /NDL /NJH /NJS /NC /NS 2>&1
 
 rem error
 if not errorlevel 0 (
