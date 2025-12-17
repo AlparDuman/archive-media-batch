@@ -56,6 +56,11 @@ exit 0
 
 
 
+
+
+
+
+
 rem recursively traverse files in the folder
 :processFolder
 for /R "%~1" %%I in (*) do call :processFile "%%~I"
@@ -65,13 +70,20 @@ exit /b 0
 
 
 
+
+
+
+
+
 rem archiving
 :processFile
 set "input=%~1"
+set "inputDrivePath=%~dp1"
 set "inputDrivePathName=%~dpn1"
 set "inputName=%~n1"
-set "wip=!tempFolder!!inputName!.wip"
-set "output=!inputDrivePathName!.archive"
+set "wipName=!inputName!.archive"
+set "wip=!tempFolder!!wipName!"
+set "output=!inputDrivePath!!wipName"
 
 rem skip on archive suffix
 if not "!inputName!"=="!inputName:.archive=!" (
@@ -136,6 +148,11 @@ exit /b 0
 
 
 
+
+
+
+
+
 rem convert as animated
 :convertAnimated
 rem WIP
@@ -146,11 +163,46 @@ exit /b 0
 
 
 
+
+
+
+
+
 rem convert as video
 :convertVideo
 rem WIP
 echo:VIDEO !input!
+
+rem support 10bit 
+set "pixfmt=yuv420p"
+for /f "tokens=*" %%a in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v:0 -show_entries stream^=bits_per_raw_sample -of default^=noprint_wrappers^=1:nokey^=1 "!input!" 2^>nul') do (
+	if "%%a"=="10" set "pixfmt=yuv420p10le"
+)
+
+rem convert to temp
+start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" ^
+-map 0:v -c:v libx264 -tag:v avc1 -crf 18 -preset placebo -x264-params ref=4:log-level=error -fps_mode cfr -g 60 ^
+-map 0:a? -c:a aac -tag:a mp4a -b:a 192k ^
+-pix_fmt !pixfmt! -movflags +faststart "!wip!.mp4"
+
+rem error
+if not errorlevel 0 (
+	del "!wip!.mp4"
+	color 0C
+    echo Encoding failed
+    pause
+	color 07
+    exit /b 1
+)
+
+rem success
+call :exportFile "mp4"
 exit /b 0
+
+
+
+
+
 
 
 
@@ -166,11 +218,21 @@ exit /b 0
 
 
 
+
+
+
+
+
 rem convert as image
 :convertImage
 rem WIP
 echo:IMAGE !input!
 exit /b 0
+
+
+
+
+
 
 
 
@@ -186,8 +248,47 @@ exit /b 0
 
 
 
+
+
+
+
+
 rem convert as music with cover
 :convertMusicCover
 rem WIP
 echo:MUSICCOVER !input!
+exit /b 0
+
+
+
+
+
+
+
+
+
+
+rem move convert output to source folder
+:exportFile
+rem prepare variables
+set "wipExtension=%~1"
+set "robocopySource=!tempFolder!"
+set "robocopyTarget=!inputDrivePath!"
+if "!robocopySource:~-1!"=="\" set "robocopySource=!robocopySource:~0,-1!"
+if "!robocopyTarget:~-1!"=="\" set "robocopyTarget=!robocopyTarget:~0,-1!"
+
+rem move file
+robocopy "!robocopySource!" "!robocopyTarget!" "!wipName!.!wipExtension!" /MOV /R:3 /W:5 /NFL /NDL /NJH /NJS /NC /NS 2>&1
+
+rem error
+if not errorlevel 0 (
+	del "!wip!.!wipExtension!"
+	color 0C
+    echo Exporting failed
+    pause
+	color 07
+    exit /b 1
+)
+
+rem success
 exit /b 0
