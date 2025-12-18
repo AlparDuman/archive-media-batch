@@ -232,26 +232,35 @@ for /f "tokens=*" %%A in ('start "" /b /belownormal /wait ffprobe -v error -sele
 rem count streams
 set "countAudioStreams=0"
 set "countVideoStreams=0"
+set "countChapterStreams=0"
 for /f %%C in ('start "" /b /belownormal /wait ffprobe -v error -select_streams a -show_entries stream^=codec_name -of csv^=p^=0 "!input!" 2^>nul ^| find /c /v ""') do (
 	if %%C gtr 0 set "countAudioStreams=%%C"
 )
 for /f %%C in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v -show_entries stream^=codec_name -of csv^=p^=0 "!input!" 2^>nul ^| find /c /v ""') do (
 	if %%C gtr 0 set "countVideoStreams=%%C"
 )
+for /f %%C in ('start "" /b /belownormal /wait ffprobe -v error -select_streams c -show_entries stream^=codec_name -of csv^=p^=0 "!input!" 2^>nul ^| find /c /v ""') do (
+	if %%C gtr 0 set "countChapterStreams=%%C"
+)
 
 rem prepare query
 set "query=-map 0:v -c:v libx264 -profile:v !profile! -tag:v avc1 -crf 18 -preset placebo -x264-params ref=4:log-level=error -fps_mode cfr -g 60"
 set "query=!query! -map 0:a? -c:a aac -tag:a mp4a -b:a 192k"
-set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
+set "query=!query! -map_metadata:g 0:g"
 for /L %%I in (1,1,!countAudioStreams!) do (
-	set /a "audioIndex=%%~I-1"
-	set "query=!query! -map_metadata:s:a:!audioIndex! 0:s:a:!audioIndex!"
+	set /a "indexAudio=%%~I-1"
+	set "query=!query! -map_metadata:s:a:!indexAudio! 0:s:a:!indexAudio!"
 )
 for /L %%I in (1,1,!countVideoStreams!) do (
-	set /a "audioIndex=%%~I-1"
-	set "query=!query! -map_metadata:s:v:!audioIndex! 0:s:v:!audioIndex!"
+	set /a "indexVideo=%%~I-1"
+	set "query=!query! -map_metadata:s:v:!indexVideo! 0:s:v:!indexVideo!"
 )
-set "query=-metadata comment="!version! !url! !query!" !query!"
+for /L %%I in (1,1,!countChapterStreams!) do (
+	set /a "indexChapter=%%~I-1"
+	set "query=!query! -map_metadata:s:c:!indexChapter! 0:s:c:!indexChapter!"
+)
+set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
+set "query=-metadata comment="Made with !version! !url! !query!" !query!"
 
 rem convert to temp
 start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" !query! "!wip!.!outputExtension!"
