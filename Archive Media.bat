@@ -21,8 +21,9 @@ set "useHardwareAcceleration=no"
 rem amd | intel | nvidia
 set "typeHardwareAcceleration=nvidia"
 
-rem enable lossless convertion,
-rem resulting files will be bigger.
+rem enable lossless convertion.
+rem trade size for quality.
+rem LOSSLESS VIDEO SIZE IS INSANE!
 rem yes | no
 set "losslessAnimated=no"
 set "losslessVideo=no"
