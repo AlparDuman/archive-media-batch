@@ -166,7 +166,7 @@ if "!hasVideo!"=="1" for /f "delims=" %%I in ('start "" /b /belownormal /wait ff
 )
 
 rem get transparency indicator
-if "!hasVideo!"=="1" for /f "tokens=*" %%i in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v:0 -show_entries stream^=pix_fmt -of csv^=p^=0 "!input!" 2^>nul') do (
+if !hasVideo! geq 1 for /f "tokens=*" %%i in ('start "" /b /belownormal /wait ffprobe -v error -select_streams v:0 -show_entries stream^=pix_fmt -of csv^=p^=0 "!input!" 2^>nul') do (
 	set "pixfmt=%%i"
 	if not "!pixfmt!"=="!pixfmt:a=!" set "hasAlpha=1"
 )
