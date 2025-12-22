@@ -14,15 +14,16 @@ setlocal enabledelayedexpansion
 
 rem ==========[ Config ]==========
 
-rem use hardware accelerators.
-rem trade quality for speed.
-rem yes | no
-set "useHardwareAcceleration=no"
-rem amd | intel | nvidia
-set "brandHardwareAcceleration=intel nvidia"
+rem Use a hardware accelerator for
+rem video conversion. Faster
+rem conversion, but lower quality.
+rem no | amd | intel | nvidia
+set "hardwareAcceleration=no"
 
-rem enable lossless convertion.
-rem trade size for quality.
+rem Enable lossless convertion.
+rem Larger file, but higher quality.
+rem LOSSLESS ANIMATED IMAGES ARE
+rem ONLY SUPPORTED BY WEB BROWSERS!
 rem LOSSLESS VIDEO SIZE IS INSANE!
 rem yes | no
 set "losslessAnimated=no"
@@ -30,18 +31,19 @@ set "losslessVideo=no"
 set "losslessImage=no"
 set "losslessMusic=no"
 
-rem auto delete source media file
-rem after successful conversion.
+rem Automatically delete the
+rem source media file after
+rem successful conversion.
 rem THIS WILL DELETE IRREVERSIBLY!
 rem yes | no
 set "autoDelete=no"
 
 rem =======[ Config Check ]=======
 
-for %%v in (useHardwareAcceleration losslessAnimated losslessVideo losslessImage losslessMusic autoDelete) do if /i not "!%%v!"=="yes" set "%%v=no"
+for %%v in (losslessAnimated losslessVideo losslessImage losslessMusic autoDelete) do if /i not "!%%v!"=="yes" set "%%v=no"
 
-echo " amd intel nvidia " | find " !brandHardwareAcceleration: =! " >nul
-if errorlevel 1 set "brandHardwareAcceleration=nvidia"
+echo " no amd intel nvidia " | find " !hardwareAcceleration: =! " >nul
+if errorlevel 1 set "hardwareAcceleration=no"
 
 rem ========[ Config End ]========
 
