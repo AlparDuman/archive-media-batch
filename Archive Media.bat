@@ -99,6 +99,7 @@ for %%F in (%*) do (
 
 rem finished
 rmdir /s /q "!tempFolder!"
+endlocal
 timeout /t 999
 exit 0
 
