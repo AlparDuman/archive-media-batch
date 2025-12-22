@@ -14,11 +14,12 @@ setlocal enabledelayedexpansion
 
 rem ==========[ Config ]==========
 
-rem auto delete source media file
-rem after successful conversion.
-rem THIS WILL DELETE IRREVERSIBLY
+rem use hardware accelerators.
+rem trade quality for speed.
 rem yes | no
-set "autoDelete=no"
+set "useHardwareAcceleration=no"
+rem amd | intel | nvidia
+set "typeHardwareAcceleration=nvidia"
 
 rem enable lossless convertion,
 rem resulting files will be bigger.
@@ -28,9 +29,18 @@ set "losslessVideo=no"
 set "losslessImage=no"
 set "losslessMusic=no"
 
+rem auto delete source media file
+rem after successful conversion.
+rem THIS WILL DELETE IRREVERSIBLY!
+rem yes | no
+set "autoDelete=no"
+
 rem =======[ Config Check ]=======
 
-for %%v in (autoDelete losslessAnimated losslessVideo losslessImage losslessMusic) do if /i not "!%%v!"=="yes" set "%%v=no"
+for %%v in (useHardwareAcceleration losslessAnimated losslessVideo losslessImage losslessMusic autoDelete) do if /i not "!%%v!"=="yes" set "%%v=no"
+
+echo " amd intel nvidia " | find " !typeHardwareAcceleration! " >nul
+if errorlevel 1 set "typeHardwareAcceleration=nvidia"
 
 rem ========[ Config End ]========
 
