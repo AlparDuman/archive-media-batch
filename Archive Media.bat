@@ -22,6 +22,8 @@ set "hardwareAcceleration=nvidia"
 
 rem Enable lossless convertion.
 rem Larger file, but higher quality.
+rem Only Nvidia offers hardware
+rem accelerated, truly lossless videos.
 rem LOSSLESS ANIMATED IMAGES ARE
 rem ONLY SUPPORTED BY WEB BROWSERS!
 rem LOSSLESS VIDEO SIZE IS INSANE!
@@ -297,7 +299,12 @@ set "profile="
 set "pixfmt="
 if "!losslessVideo!"=="yes" (
 
-	if "!hardwareAcceleration!"=="no" (
+	if "!hardwareAcceleration!"=="nvidia" (
+		set "pixfmt=yuv444p"
+		if "!bitDepth!"=="10" set "pixfmt=p010le"
+		if !bitDepth! geq 12 set "pixfmt=p016le"
+		set "query=-map 0:v -c:v hevc_nvenc -profile:v rext -tag:v hvc1 -preset losslesshp -rc constqp -qp 0 -rc-lookahead 48 -multipass 2 -max_b_frames 4"
+	) else (
 		set "profile=main444-8"
 		set "pixfmt=yuv444p"
 		if "!bitDepth!"=="10" (
@@ -315,18 +322,8 @@ if "!losslessVideo!"=="yes" (
 		set "query=-map 0:v -c:v libx265 -profile:v !profile! -tag:v hvc1 -preset placebo -crf 0 -x265-params lossless=1:ref=4:log-level=error"
 	)
 
-	rem if "!hardwareAcceleration!"=="amd" set "query=-map 0:v -c:v hevc_amf -tag:v hvc1 -rc cqp -cqp 0 -quality quality"
-	rem if "!hardwareAcceleration!"=="intel" set "query=-map 0:v -c:v hevc_qsv -tag:v hvc1 -global_quality 0 -preset 1 -look_ahead 1"
-
-	if "!hardwareAcceleration!"=="nvidia" (
-		set "pixfmt=yuv444p"
-		if "!bitDepth!"=="10" set "pixfmt=p010le"
-		if !bitDepth! geq 12 set "pixfmt=p016le"
-		set "query=-map 0:v -c:v hevc_nvenc -profile:v rext -tag:v hvc1 -preset losslesshp -rc constqp -qp 0 -rc-lookahead 48 -multipass 2 -max_b_frames 4"
-	)
-
 	set "query=!query! -fps_mode cfr -force_key_frames #expr:gte(t,n_forced*1)#"
-	set "query=!query! -map 0:a? -c:a flac -compression_level 12"
+	set "query=!query! -map 0:a? -c:a pcm_s32le"
 	set "query=!query:#="!"
 
 ) else (
