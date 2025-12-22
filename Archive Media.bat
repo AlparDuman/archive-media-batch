@@ -209,8 +209,52 @@ exit /b 0
 
 rem convert as animated
 :convertAnimated
-rem WIP
-echo:CONVERT IMAGE ANIMATED !input!
+if "!losslessAnimated!"=="yes" (
+	set "outputExtension=apng"
+) else (
+	set "outputExtension=gif"
+)
+
+rem archived already exists
+if exist "!inputDrivePath!!outputName!.!outputExtension!" (
+	echo:EXIST !inputDrivePath!!outputName!.!outputExtension!
+	exit /b 0
+)
+
+rem announce conversion
+echo:CONVERT ANIMATED !input!
+
+rem prepare query
+set "query=-map 0 -map_metadata 0"
+set "filePalette="
+if "!losslessAnimated!"=="yes" (
+
+	set "query=!query! -c:v apng -pix_fmt rgba -compression_level 9 -q:v 0 -qmin 1 -plays 0 -loop 0 -metadata:s:v loop=0"
+
+) else (
+	
+	set "filePalette=!tempFolder!palette.png"
+	start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" -vf "scale=iw:ih:flags=lanczos,palettegen=max_colors=256:stats_mode=diff" -y "!filePalette!"
+	set "query=-i #!filePalette!# -i #!input!# -lavfi #scale=iw:ih:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5#"
+	set "query=!query:#="!"
+
+)
+
+rem convert to temp
+start "" /b /belownormal /wait ffmpeg -hide_banner -y -v error -stats -i "!input!" !query! "!wip!.!outputExtension!"
+if exist "!filePalette!" del "!filePalette!"
+
+rem error
+if not errorlevel 0 (
+	del "!wip!.!outputExtension!"
+	color 0C
+    echo Encoding failed
+    pause
+	color 07
+    exit /b 1
+)
+
+rem success
 exit /b 0
 
 
