@@ -268,7 +268,11 @@ exit /b 0
 
 rem convert as video
 :convertVideo
-set "outputExtension=mp4"
+if "!losslessVideo!"=="yes" (
+	set "outputExtension=mkv"
+) else (
+	set "outputExtension=mp4"
+)
 
 rem archived already exists
 if exist "!inputDrivePath!!outputName!.!outputExtension!" (
@@ -288,8 +292,26 @@ for /f "tokens=*" %%A in ('start "" /b /belownormal /wait ffprobe -v error -sele
 )
 
 rem prepare query
-set "query=-map 0:v -c:v libx264 -profile:v !profile! -tag:v avc1 -crf 18 -preset ultrafast -x264-params ref=4:log-level=error -fps_mode cfr -g 60"
-set "query=!query! -map 0:a? -c:a aac -tag:a mp4a -b:a 192k"
+if "!losslessVideo!"=="yes" (
+
+	set "pixfmt=!pixfmt:420=444!"
+	if "!profile!"=="high10" (
+		set "profile=main444-10"
+	) else (
+		set "profile=main444-8"
+	)
+	set "query=-map 0:v -c:v libx265 -profile:v !profile! -tag:v hevc -crf 0 -preset placebo -x265-params lossless=1:ref=4:log-level=error -fps_mode cfr -force_key_frames #expr:gte(t,n_forced*1)#"
+	set "query=!query! -map 0:a? -c:a flac -compression_level 12"
+	set "query=!query:#="!"
+
+) else (
+
+	set "query=-map 0:v -c:v libx264 -profile:v !profile! -tag:v avc1 -crf 18 -preset placebo -x264-params ref=4:log-level=error -fps_mode cfr -force_key_frames #expr:gte(t,n_forced*1)#"
+	set "query=!query! -map 0:a? -c:a aac -tag:a mp4a -b:a 192k"
+	set "query=!query:#="!"
+
+)
+
 set "query=!query! -map_metadata:g 0:g"
 set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
 set "query=-metadata comment="Made with !version! !url! !query!" !query!"
