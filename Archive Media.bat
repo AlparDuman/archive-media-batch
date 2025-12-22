@@ -19,7 +19,7 @@ rem trade quality for speed.
 rem yes | no
 set "useHardwareAcceleration=no"
 rem amd | intel | nvidia
-set "typeHardwareAcceleration=nvidia"
+set "brandHardwareAcceleration=nvidia"
 
 rem enable lossless convertion.
 rem trade size for quality.
@@ -40,8 +40,8 @@ rem =======[ Config Check ]=======
 
 for %%v in (useHardwareAcceleration losslessAnimated losslessVideo losslessImage losslessMusic autoDelete) do if /i not "!%%v!"=="yes" set "%%v=no"
 
-echo " amd intel nvidia " | find " !typeHardwareAcceleration! " >nul
-if errorlevel 1 set "typeHardwareAcceleration=nvidia"
+echo " amd intel nvidia " | find " !brandHardwareAcceleration! " >nul
+if errorlevel 1 set "brandHardwareAcceleration=nvidia"
 
 rem ========[ Config End ]========
 
