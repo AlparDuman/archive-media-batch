@@ -20,9 +20,17 @@ rem THIS WILL DELETE IRREVERSIBLY
 rem yes | no
 set "autoDelete=no"
 
+rem enable lossless convertion,
+rem resulting files will be bigger.
+rem yes | no
+set "losslessAnimated=no"
+set "losslessVideo=no"
+set "losslessImage=no"
+set "losslessMusic=no"
+
 rem =======[ Config Check ]=======
 
-if not "!autoDelete!"=="yes" set "autoDelete=no"
+for %%v in (autoDelete losslessAnimated losslessVideo losslessImage losslessMusic) do if /i not "!%%v!"=="yes" set "%%v=no"
 
 rem ========[ Config End ]========
 
