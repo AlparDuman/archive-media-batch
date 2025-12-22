@@ -366,7 +366,7 @@ echo:CONVERT IMAGE !input!
 
 rem prepare query
 if "!outputExtension!"=="jpg" (
-	set "query=-q:v 1"
+	set "query=-pix_fmt yuvj444p -q:v 1 -qmin 1"
 ) else (
 	set "query=-pix_fmt rgba -compression_level 9"
 )
@@ -414,7 +414,7 @@ set "query=-map 0 -map_metadata 0 -c:a libmp3lame -q:a 0 -id3v2_version 3"
 
 rem embed cover image
 if "!hasVideo!"=="1" (
-	set "query=!query! -metadata:s:v title=#Album cover# -metadata:s:v comment=#Cover (Front)# -c:v mjpeg -q:v 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
+	set "query=!query! -metadata:s:v title=#Album cover# -metadata:s:v comment=#Cover (Front)# -c:v mjpeg -q:v 1 -qmin 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
 	set "query=!query:#="!"
 )
 
