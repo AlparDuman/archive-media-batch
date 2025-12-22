@@ -420,7 +420,11 @@ exit /b 0
 
 rem convert as music with optional cover image
 :convertMusic
-set "outputExtension=mp3"
+if "!losslessMusic!"=="yes" (
+	set "outputExtension=flac"
+) else (
+	set "outputExtension=mp3"
+)
 
 rem archived already exists
 if exist "!inputDrivePath!!outputName!.!outputExtension!" (
@@ -432,12 +436,20 @@ rem announce conversion
 echo:CONVERT MUSIC !input!
 
 rem prepare query
-set "query=-map 0 -map_metadata 0 -c:a libmp3lame -q:a 0 -id3v2_version 3"
+set "query=-map 0 -map_metadata 0"
+if "!losslessMusic!"=="yes" (
 
-rem embed cover image
-if "!hasVideo!"=="1" (
-	set "query=!query! -metadata:s:v title=#Album cover# -metadata:s:v comment=#Cover (Front)# -c:v mjpeg -q:v 1 -qmin 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
-	set "query=!query:#="!"
+	set "query=!query! -c:a flac -compression_level 12"
+	if "!hasVideo!"=="1" set "query=!query! -disposition:v attached_pic"
+
+) else (
+
+	set "query=!query! -c:a libmp3lame -q:a 0 -id3v2_version 3"
+	if "!hasVideo!"=="1" (
+		set "query=!query! -metadata:s:v title=#Album cover# -metadata:s:v comment=#Cover (Front)# -c:v mjpeg -q:v 1 -qmin 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
+		set "query=!query:#="!"
+	)
+
 )
 
 rem convert to temp
