@@ -7,9 +7,9 @@ A windows batch wrapping [FFmpeg](https://www.ffmpeg.org/) to convert media (mus
 > 3. Lossless uses less common codecs.
 
 > [!IMPORTANT]
-> 2. Untested AMD hardware accelerated
-> 3. Untested Intel hardware accelerated
-> 4. Untested Nvidia hardware accelerated
+> 1. Untested AMD hardware accelerated
+> 2. Untested Intel hardware accelerated
+> 3. Untested Nvidia hardware accelerated
 
 > [!NOTE]
 > Hardware accelerated, truly lossless video encoding is only available on Nvidia.
