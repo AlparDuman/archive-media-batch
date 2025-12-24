@@ -253,6 +253,7 @@ if "!losslessAnimated!"=="yes" (
 )
 
 rem add comment
+set "query=!query! -map_metadata 0"
 set "query=-metadata comment=#Made with !version! !url! !query!# !query!"
 set "query=!query:#="!"
 
@@ -309,7 +310,7 @@ for /f "tokens=*" %%A in ('start "" /b /belownormal /wait ffprobe -v error -sele
 )
 
 rem prepare query
-set "query=-map 0 -map_metadata 0"
+set "query=-map 0"
 set "profile="
 set "pixfmt="
 if "!losslessVideo!"=="yes" (
@@ -364,7 +365,7 @@ if "!losslessVideo!"=="yes" (
 )
 
 rem finsih query
-set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
+set "query=!query! -map_metadata 0 -pix_fmt !pixfmt! -movflags +faststart"
 set "query=-metadata comment=#Made with !version! !url! !query!# !query!"
 set "query=!query:#="!"
 
@@ -432,14 +433,14 @@ rem announce conversion
 echo:CONVERT IMAGE !input!
 
 rem prepare query
-set "query=-map 0 -map_metadata 0"
 if "!outputExtension!"=="jpg" (
-	set "query=!query! -pix_fmt yuvj420p -q:v 1 -qmin 1"
+	set "query=-pix_fmt yuvj420p -q:v 1 -qmin 1"
 ) else (
-	set "query=-!query! -pix_fmt rgba -compression_level 9"
+	set "query=-pix_fmt rgba -compression_level 9"
 )
 
 rem finsih query
+set "query=!query! -map_metadata 0"
 set "query=-metadata comment=#Made with !version! !url! !query!# !query!"
 set "query=!query:#="!"
 
