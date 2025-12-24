@@ -21,11 +21,10 @@ rem no | amd | intel | nvidia
 set "hardwareAcceleration=nvidia"
 
 rem Enable lossless convertion.
-rem Larger file, but higher quality.
 rem Only Nvidia offers hardware
-rem accelerated, truly lossless videos.
-rem LOSSLESS ANIMATED IMAGES ARE
-rem ONLY SUPPORTED BY WEB BROWSERS!
+rem accelerated, truly lossless.
+rem LOSSLESS FORMATS MAY NOT BE
+rem NATIVELY SUPPORTED!
 rem LOSSLESS VIDEO SIZE IS INSANE!
 rem yes | no
 set "losslessAnimated=no"
@@ -76,7 +75,7 @@ rem	<https://github.com/AlparDuman/archive-media-batch/blob/main/LICENSE>
 rem	else <https://www.gnu.org/licenses/>.
 
 rem global variables
-set "version=v2.0a"
+set "version=v2.0b"
 set "url=https://github.com/AlparDuman/archive-media-batch"
 set "tempFolder=%TEMP%\github-alparduman-archive-media-batch\"
 
@@ -350,6 +349,7 @@ if "!losslessVideo!"=="yes" (
 
 )
 
+rem finsih query
 set "query=!query! -map_metadata:g 0:g"
 set "query=!query! -pix_fmt !pixfmt! -movflags +faststart"
 set "query=-metadata comment="Made with !version! !url! !query!" !query!"
