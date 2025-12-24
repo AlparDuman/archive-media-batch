@@ -497,8 +497,7 @@ if "!losslessMusic!"=="yes" (
 
 	set "query=!query! -c:a libmp3lame -q:a 0 -id3v2_version 3"
 	if "!hasVideo!"=="1" (
-		set "query=!query! -metadata:s:v title=#Album cover# -metadata:s:v comment=#Cover (Front)# -c:v mjpeg -q:v 1 -qmin 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
-		set "query=!query:#="!"
+		set "query=!query! -c:v mjpeg -q:v 1 -qmin 1 -vf #crop='min(in_w\,in_h)':'min(in_w\,in_h)',scale='if(gt(in_w\,3000)\,3000\,in_w)':'if(gt(in_h\,3000)\,3000\,in_h)':flags=lanczos#"
 	)
 
 )
