@@ -18,7 +18,7 @@ rem Use a hardware accelerator for
 rem video conversion. Faster
 rem conversion, but lower quality.
 rem no | amd | intel | nvidia
-set "hardwareAcceleration=nvidia"
+set "hardwareAcceleration=no"
 
 rem Enable lossless convertion.
 rem Only Nvidia offers hardware
@@ -37,7 +37,7 @@ rem source media file after
 rem successful conversion.
 rem THIS WILL DELETE IRREVERSIBLY!
 rem yes | no
-set "autoDelete=yes"
+set "autoDelete=no"
 
 rem =======[ Config Check ]=======
 
@@ -75,7 +75,7 @@ rem	<https://github.com/AlparDuman/archive-media-batch/blob/main/LICENSE>
 rem	else <https://www.gnu.org/licenses/>.
 
 rem global variables
-set "version=v2.0b"
+set "version=v2.0rc"
 set "url=https://github.com/AlparDuman/archive-media-batch"
 set "tempFolder=%TEMP%\github-alparduman-archive-media-batch\"
 
