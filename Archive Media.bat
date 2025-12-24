@@ -23,9 +23,8 @@ set "hardwareAcceleration=no"
 rem Enable lossless convertion.
 rem Only Nvidia offers hardware
 rem accelerated, truly lossless.
-rem LOSSLESS FORMATS MAY NOT BE
-rem NATIVELY SUPPORTED!
-rem LOSSLESS VIDEO SIZE IS INSANE!
+rem LOSSLESS USES LESS COMMON
+rem CODECS AND SIZE IS INSANE!
 rem yes | no
 set "losslessAnimated=no"
 set "losslessVideo=no"
