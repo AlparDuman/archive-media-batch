@@ -56,7 +56,7 @@ rem ========[ Config End ]========
 
 
 
-rem	Copyright (C) 2025 Alpar Duman
+rem	Copyright (C) 2026 Alpar Duman
 rem	This file is part of archive-media-batch.
 rem	
 rem	archive-media-batch is free software: you can redistribute it and/or modify
