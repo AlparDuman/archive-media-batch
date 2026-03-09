@@ -74,7 +74,7 @@ rem	<https://github.com/AlparDuman/archive-media-batch/blob/main/LICENSE>
 rem	else <https://www.gnu.org/licenses/>.
 
 rem global variables
-set "version=v2.0rc"
+set "version=v2.0"
 set "url=https://github.com/AlparDuman/archive-media-batch"
 set "tempFolder=%TEMP%\github-alparduman-archive-media-batch\"
 
